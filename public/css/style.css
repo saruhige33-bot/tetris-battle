@@ -149,6 +149,42 @@ body {
   color: #9ca3af;
 }
 
+.controls-help {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 160px;
+}
+
+.controls-help h4 {
+  margin: 0 0 6px;
+}
+
+.controls-help ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #d1d5db;
+}
+
+.controls-help .key {
+  display: inline-block;
+  min-width: 64px;
+  margin-right: 6px;
+  padding: 1px 6px;
+  background: #1f2937;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  color: #facc15;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
 #result-title {
   font-size: 2.2rem;
   color: #facc15;

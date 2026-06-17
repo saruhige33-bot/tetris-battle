@@ -9,7 +9,7 @@ const LOCK_DELAY_MS = 500;
 const LINE_SCORE = [0, 100, 300, 500, 800];
 
 function gravityMsForLevel(level) {
-  return Math.max(80, 1000 - (level - 1) * 60);
+  return Math.max(200, 1000 - (level - 1) * 40);
 }
 
 export class GameEngine {

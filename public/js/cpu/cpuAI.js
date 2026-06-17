@@ -117,36 +117,27 @@ export class CpuController {
         this.state = 'idle';
         return;
       }
-      this._executeStep();
+      this._executePlan();
     }
   }
 
-  _executeStep() {
+  // 思考完了後、配置が決まったら移動・回転・ハードドロップを1フレームで完了させる。
+  // 重力速度に左右されて操作が間に合わず自滅する、という不自然な弱さを避けるため。
+  // CPUの強さは decideMove の評価ノイズ/ミス確率のみで表現する。
+  _executePlan() {
     const engine = this.engine;
     const plan = this.plan;
 
     if (plan.useHold) {
       engine.holdPiece();
-      plan.useHold = false;
-      return;
     }
 
-    if (engine.current.rotation !== plan.rotation) {
-      if (!engine.tryRotate(1)) {
-        // 回転できない場合は計画ごと諦めて再思考する
-        this.plan = null;
-        this.state = 'idle';
-      }
-      return;
+    for (let guard = 0; guard < 4 && engine.current.rotation !== plan.rotation; guard++) {
+      if (!engine.tryRotate(1)) break;
     }
 
-    if (engine.current.x < plan.x) {
-      engine.tryMove(1, 0);
-      return;
-    }
-    if (engine.current.x > plan.x) {
-      engine.tryMove(-1, 0);
-      return;
+    for (let guard = 0; guard < BOARD_WIDTH + 2 && engine.current.x !== plan.x; guard++) {
+      if (!engine.tryMove(Math.sign(plan.x - engine.current.x), 0)) break;
     }
 
     engine.hardDrop();
