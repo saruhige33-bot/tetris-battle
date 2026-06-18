@@ -11,6 +11,12 @@ const WEIGHTS = {
   maxHeight: 1.5,
 };
 
+// 積み上がるほどミスを減らし、危険水域では必ず最善手を選ぶ(自滅防止)。
+// SAFE_HEIGHT以下では難易度どおりのミス率、DANGER_HEIGHT以上ではミス率0、
+// その間は線形に下げる。
+const SAFE_HEIGHT = 6;
+const DANGER_HEIGHT = 14;
+
 function gaussianNoise(mean, sigma) {
   const u1 = Math.max(Math.random(), 1e-9);
   const u2 = Math.random();
@@ -75,7 +81,14 @@ export function decideMove(board, currentType, holdType, difficultyName = 'norma
   }
   candidates.sort((a, b) => b.noisyScore - a.noisyScore);
 
-  if (Math.random() < preset.mistakeRate && candidates.length > 1) {
+  // 積み上がるほどミスをしなくなるようにする。どの難易度でも自滅は避け、
+  // 強さの差は余裕がある場面でのミス率/ノイズだけで表現する。
+  const heights = getColumnHeights(board);
+  const maxHeight = Math.max(...heights);
+  const dangerFactor = Math.max(0, Math.min(1, (maxHeight - SAFE_HEIGHT) / (DANGER_HEIGHT - SAFE_HEIGHT)));
+  const effectiveMistakeRate = preset.mistakeRate * (1 - dangerFactor);
+
+  if (Math.random() < effectiveMistakeRate && candidates.length > 1) {
     const poolSize = Math.min(3, candidates.length);
     return candidates[Math.floor(Math.random() * poolSize)];
   }
