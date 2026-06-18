@@ -140,7 +140,11 @@ function tick(deltaMs) {
 
   if (mode === 'cpu' && cpuEngine && cpuController) {
     cpuController.update(deltaMs);
-    cpuEngine.update(deltaMs, false);
+    // CPUが思考中は重力・ロック遅延を進めない(考え終わる前に勝手にロックされて
+    // 評価関数を無視した配置になってしまうのを防ぐ)
+    if (!cpuController.isThinking()) {
+      cpuEngine.update(deltaMs, false);
+    }
     if (cpuEngine.lastAttackSent > 0) {
       selfEngine.receiveGarbage(cpuEngine.lastAttackSent);
       cpuEngine.lastAttackSent = 0;

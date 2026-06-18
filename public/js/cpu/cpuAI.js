@@ -5,10 +5,10 @@ import { BOARD_WIDTH, DIFFICULTY_PRESETS } from '../shared/constants.js';
 
 const WEIGHTS = {
   lines: 3.0,
-  height: 0.5,
-  holes: 4.0,
-  bumpiness: 0.3,
-  maxHeight: 1.0,
+  height: 0.8,
+  holes: 6.5,
+  bumpiness: 0.4,
+  maxHeight: 1.5,
 };
 
 function gaussianNoise(mean, sigma) {
@@ -119,6 +119,13 @@ export class CpuController {
       }
       this._executePlan();
     }
+  }
+
+  // CPUが思考中は呼び出し側でengine.update()自体を止めるべきか判定するためのフラグ。
+  // 思考中も重力が進むと、考え終わる前にミノが勝手にロックされてしまい、
+  // 本来の評価関数によらない劣化した配置が積み重なって不自然に自滅する。
+  isThinking() {
+    return this.state === 'idle' || this.state === 'thinking';
   }
 
   // 思考完了後、配置が決まったら移動・回転・ハードドロップを1フレームで完了させる。

@@ -21,7 +21,7 @@ export const ROOM_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const ROOM_CODE_LENGTH = 6;
 
 export const DIFFICULTY_PRESETS = {
-  easy: { mistakeRate: 0.4, noiseSigma: 3.5, thinkDelayMs: [350, 700] },
-  normal: { mistakeRate: 0.15, noiseSigma: 1.5, thinkDelayMs: [200, 500] },
+  easy: { mistakeRate: 0.3, noiseSigma: 2.5, thinkDelayMs: [350, 700] },
+  normal: { mistakeRate: 0.08, noiseSigma: 1.0, thinkDelayMs: [200, 500] },
   hard: { mistakeRate: 0.03, noiseSigma: 0.5, thinkDelayMs: [80, 200] },
 };
