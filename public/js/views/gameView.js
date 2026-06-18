@@ -70,7 +70,7 @@ export function startCpuGame(difficulty) {
   resultShown = false;
   const seed = Math.floor(Math.random() * 2147483647);
   selfEngine = new GameEngine({ seed: seed + 1 });
-  cpuEngine = new GameEngine({ seed: seed + 2 });
+  cpuEngine = new GameEngine({ seed: seed + 2, neverGameOver: true });
   cpuController = new CpuController(cpuEngine, difficulty);
   document.getElementById('opponent-label').textContent = 'CPU';
   appRef.showView('game');

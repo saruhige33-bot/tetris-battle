@@ -3,6 +3,7 @@ import { findFullLines, clearLines } from './lineClear.js';
 import { calculateAttack, insertGarbage, GarbageQueue } from './garbage.js';
 import { SevenBagRandomizer } from './rng.js';
 import { PIECE_COLOR_INDEX, WALL_KICKS, SPAWN_X, SPAWN_Y } from './pieces.js';
+import { BOARD_BUFFER } from '../shared/constants.js';
 
 const NEXT_QUEUE_SIZE = 5;
 const LOCK_DELAY_MS = 500;
@@ -13,7 +14,8 @@ function gravityMsForLevel(level) {
 }
 
 export class GameEngine {
-  constructor({ seed } = {}) {
+  constructor({ seed, neverGameOver = false } = {}) {
+    this.neverGameOver = neverGameOver;
     this.rng = new SevenBagRandomizer(seed);
     this.board = createEmptyBoard();
     this.nextQueue = [];
@@ -42,8 +44,27 @@ export class GameEngine {
     this.lockTimer = 0;
     this.fallTimer = 0;
     if (!isValidPosition(this.board, type, 0, this.current.x, this.current.y)) {
-      this.gameOver = true;
+      if (this.neverGameOver) {
+        this._emergencyClearTop();
+      } else {
+        this.gameOver = true;
+      }
     }
+  }
+
+  // CPU専用の安全装置。新しいミノを置く場所すらない状況になったら、
+  // ゲームオーバーにする代わりにスポーン位置周辺を強制的に空けて続行する。
+  // どれだけ評価関数のミスが重なっても、CPUは絶対に詰まない。
+  _emergencyClearTop() {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      for (let r = 0; r < BOARD_BUFFER; r++) {
+        this.board[r] = new Array(this.board[r].length).fill(0);
+      }
+      if (isValidPosition(this.board, this.current.type, 0, this.current.x, this.current.y)) {
+        return;
+      }
+    }
+    this.board = createEmptyBoard();
   }
 
   tryMove(dx, dy) {
